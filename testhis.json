@@ -1,0 +1,11 @@
+{
+    "tabs" : [
+        {
+            "id": 1,
+            "name": "hoge",
+            "domain": "hoge.com",
+            "time": 0,
+            "recent": 0
+        }
+    ]
+}

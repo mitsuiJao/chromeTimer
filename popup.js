@@ -1,5 +1,11 @@
 "use strict";
 importScripts("timer.js");
+const path = "testhis.json";
+fetch(path)
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+    });
 
 const gettabs = function (from) {
     console.log(from);
@@ -8,6 +14,10 @@ const gettabs = function (from) {
         console.log(data[0].url);
     });
 }
+
+// const newTabs = function (domainName, filter){
+//     let domainName = new Timer();
+// }
 
 chrome.tabs.onActivated.addListener(function (activeInfo) {
     // タブがアクティブになった時の処理
