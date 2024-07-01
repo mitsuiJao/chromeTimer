@@ -1,0 +1,18 @@
+{
+    "name": "time-tracker",
+    "description": "",
+    "version": "1.0",
+    "manifest_version": 3,
+    "permissions": [
+        "activeTab",
+        "scripting",
+        "tabs",
+        "windows"
+    ],
+    "action": {
+        "default_popup": "popup.html"
+    },
+    "background": {
+        "service_worker": "popup.js"
+    }
+}
