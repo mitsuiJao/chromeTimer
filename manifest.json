@@ -13,6 +13,17 @@
         "default_popup": "popup.html"
     },
     "background": {
-        "service_worker": "popup.js"
-    }
+        "service_worker": "./src/background.js",
+        "type": "module"
+    },
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "testhis.json"
+            ],
+            "matches": [
+                "<all_urls>"
+            ]
+        }
+    ]
 }
