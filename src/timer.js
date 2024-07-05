@@ -1,11 +1,11 @@
-class Timer {
-    constructor(timeid) {
+export class Timer {
+    constructor() {
         this.time;
         this.total = 0;
-        this.timeid = timeid;
+        this.latest = 0;
     }
 
-    start() {
+    start(n=0) {
         this.t0 = new Date();
         console.log("Timer started");
         this.interaval = setInterval(this.timer.bind(this), 1000);
@@ -14,6 +14,7 @@ class Timer {
     stop() {
         console.log("Timer stopped");
         this.total += this.time;
+        this.latest = new Date();
         clearInterval(this.interaval);
     }
 
