@@ -26,7 +26,6 @@ export class Timer {
         let t = new Date();
         let diff = t.getTime() - this.t0.getTime();
         this.time = diff;
-        console.log(this.formatTime(this.time));
     }
 
     formatTime(time) {

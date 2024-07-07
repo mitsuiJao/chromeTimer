@@ -32,24 +32,32 @@ class TabTimer {
         this.updateKeymap();
         this.latestobj = new Timer();
         this.latestobj.start();
-        this.latestid = 0;
+        this.URLlatestid = 0;
+        this.DOMAINlatestid = 0;
         this.first = true;
     }
 
     add(url, title) {
-        // before obj 
+        // :before
         console.log(this.result);
         this.latestobj.stop();
         let time = this.latestobj.time;                     // 前回addからの経過時間
-        let current = this.result.url[this.latestid].timer; // 現在のtime
-        this.result.url[this.latestid].timer += time;       // 現在のtimeに加算
-        current = this.result.url[this.latestid].timer;     // tmp
-        this.result.url[this.latestid].timerdisplay = this.latestobj.formatTime(current);   // 表示用に変換, 更新
-        this.result.url[this.latestid].recent = new Date();       // 最新の経過時間
+        console.log(time);
+        let URLcurrent = this.result.url[this.URLlatestid].timer; // 現在のtime
+        let DOMAINcurrent = this.result.domain[this.DOMAINlatestid].timer; // 現在のtime
+        this.result.url[this.URLlatestid].timer += time;       // 現在のtimeに加算
+        this.result.domain[this.DOMAINlatestid].timer += time;    // 現在のtimeに加算
+        URLcurrent = this.result.url[this.URLlatestid].timer;     // tmp
+        DOMAINcurrent = this.result.domain[this.DOMAINlatestid].timer; // tmp
+        this.result.url[this.URLlatestid].timerdisplay = this.latestobj.formatTime(URLcurrent);   // 表示用に変換, 更新
+        this.result.domain[this.DOMAINlatestid].timerdisplay = this.latestobj.formatTime(DOMAINcurrent); // 表示用に変換, 更新
+        this.result.url[this.URLlatestid].recent = new Date();       // 最新の経過時間
+        this.result.domain[this.DOMAINlatestid].recent = new Date();    // 最新の経過時間
 
         // let domain = this.getdomain(url);
-        let found = this.find(url, 0); // url
+        let found = this.find(url, 0); // usrl
 
+        // :after
         if (!found) {    // result does not exist
             this.n++;
             this.result.url.push({
@@ -64,16 +72,20 @@ class TabTimer {
             timerobj.start();
 
             this.latestobj = timerobj;
-            this.latestid = this.n;
+            this.URLlatestid = this.n;
 
         } else {        // result already exists
             let timerobj = new Timer();
             let current = this.result.url[found].timer;
             timerobj.start(current);
             this.latestobj = timerobj;
-            this.latestid = found;
+            this.URLlatestid = found;
         }
-    }    
+    }
+
+    _reload() {
+        this.add("https://example.com/example", "example");
+    }
 
     getdomain(url) {
         let dmain = url.split("/")[2];
@@ -111,14 +123,46 @@ class TabTimer {
     }
 }
 
-// tabtimer.add("https://example.com/example", "example"); // 3seconds
+
+
+async function getTabInfo(from) { //  awaitはpromiseのresolveを待ち、その値を返す、rejectされた場合はエラーを投げる
+    // console.log(from);
+    let tabinfo = {
+        "forcus": {
+            "url": "",
+            "title": ""
+        },
+        "audio": {
+            "url": "",
+            "title": "",
+        }
+    };
+    
+    let forcus = await chrome.tabs.query({ active: true, currentWindow: true });
+    tabinfo.forcus.url = forcus[0].url;
+    tabinfo.forcus.title = forcus[0].title;
+    
+    try {
+        let audio = await chrome.tabs.query({ audible: true });
+        tabinfo.audio.url = audio[0].url;
+        tabinfo.audio.title = audio[0].title;
+    } catch (error) {
+        console.log("audible: None");
+    }
+    return tabinfo;
+}
+
+let tabtimer = new TabTimer();
+let flg = false;
+
+// tabtimer.add("https://example.com/example100", "example"); // 3seconds
 // console.log(tabtimer);
 
 // setTimeout(() => { 
 //     tabtimer.add("https://example.com/example2", "example2"); // 4seconds
 //     console.log(tabtimer);
 //     setTimeout(() => { 
-//         tabtimer.add("https://example.com/example", "example"); // 5seconds
+//         tabtimer.add("https://example.com/example100", "example"); // 5seconds
 //         console.log(tabtimer);
 //         setTimeout(() => { 
 //             tabtimer.add("https://example.com/example3", "example"); // 00
@@ -127,47 +171,43 @@ class TabTimer {
 //     }, 4000);
 // }, 3000);
 
-const gettabs = function (from) {
-    console.log(from);
-    let forcus = chrome.tabs.query({ active: true, currentWindow: true });
-    let audio = chrome.tabs.query({ audible: true });
 
-    console.log(forcus);
-    return [forcus, audio];
-    console.log(then(forcus));
-
-    forcus.then(function (data) {
-        console.log("forcus: " + data[0].url);
-
-    });
-
-    audio.then(function (data) {
-        console.log("audible: " + data[0].url);
-    })
-        .catch(function (error) {
-            console.log("audible: None");
-        });
-    
-    return {forcus, audio};
-}
-
-let tabtimer = new TabTimer();
-
-chrome.tabs.onActivated.addListener(function (activeInfo) {
-    let tab = gettabs("onActivated");
-    tab[0].then(function (data) {
-        console.log(data[0].url);
-    });
+chrome.tabs.onActivated.addListener(async function (activeInfo) {
+    if (flg) {
+        return;
+    } else {
+        flg = true;
+        setTimeout(() => { flg = false; }, 100);
+    }
+    console.log("onActivated");
+    let data = await getTabInfo()
+    tabtimer.add(data.forcus.url, data.forcus.title);
 });
 
-chrome.windows.onFocusChanged.addListener(function (windowId) {
+chrome.windows.onFocusChanged.addListener(async function (windowId) {
+    if (flg) {
+        return;
+    } else {
+        flg = true;
+        setTimeout(() => { flg = false; }, 100);
+    }
     if (windowId != -1) {
-        gettabs("onFocusChanged");
+        console.log("onFocusChanged");
+        let data = await getTabInfo()
+        tabtimer.add(data.forcus.url, data.forcus.title);
     }
 });
 
-chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
-    if (changeInfo.url != undefined) {
-        gettabs("onUpdated");
+chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, tab) {
+    if (flg) {
+        return;
+    } else {
+        flg = true;
+        setTimeout(() => { flg = false; }, 100);
     }
+    if (changeInfo.url != undefined) {
+        console.log("onUpdated");
+        let data = await getTabInfo()
+        tabtimer.add(data.forcus.url, data.forcus.title);
+        }
 });
