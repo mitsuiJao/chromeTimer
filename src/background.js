@@ -5,85 +5,98 @@ class TabTimer {
     constructor() {
         this.n = 0;
         this.recent;
-        this.result =
-        {
-            "url": [
-                {
-                    "urlID": 0,
-                    "title": "example",
-                    "url": "https://example.com/example",
-                    "timer": 0,
-                    "timerdisplay": "0:0:0:0",
-                    "recent": 0,
-                }
-            ],
-            "domain": [
-                {
-                    "domainID": 0,
-                    "domain": "example.com",
-                    "timer": 0,
-                    "timerdisplay": "0:0:0:0",
-                    "recent": 0,
-                }
-            ]
-        }
+        this.result = {url: [], domain: []};
         this.urlkeymap = {};
         this.domainkeymap = {};
         this.updateKeymap();
-        this.latestobj = new Timer();
-        this.latestobj.start();
-        this.URLlatestid = 0;
-        this.DOMAINlatestid = 0;
-        this.first = true;
+        this.timerobj = new Timer();
+        this._init();
+        this.URLindex = 0;
+        this.DOMAINindex = 0;
     }
 
-    add(url, title) {
-        // :before
+    load(url, title) {
+        this.totalize(url, title, 0);
+        this.totalize(url, title, 1);
         console.log(this.result);
-        this.latestobj.stop();
-        let time = this.latestobj.time;                     // 前回addからの経過時間
-        console.log(time);
-        let URLcurrent = this.result.url[this.URLlatestid].timer; // 現在のtime
-        let DOMAINcurrent = this.result.domain[this.DOMAINlatestid].timer; // 現在のtime
-        this.result.url[this.URLlatestid].timer += time;       // 現在のtimeに加算
-        this.result.domain[this.DOMAINlatestid].timer += time;    // 現在のtimeに加算
-        URLcurrent = this.result.url[this.URLlatestid].timer;     // tmp
-        DOMAINcurrent = this.result.domain[this.DOMAINlatestid].timer; // tmp
-        this.result.url[this.URLlatestid].timerdisplay = this.latestobj.formatTime(URLcurrent);   // 表示用に変換, 更新
-        this.result.domain[this.DOMAINlatestid].timerdisplay = this.latestobj.formatTime(DOMAINcurrent); // 表示用に変換, 更新
-        this.result.url[this.URLlatestid].recent = new Date();       // 最新の経過時間
-        this.result.domain[this.DOMAINlatestid].recent = new Date();    // 最新の経過時間
+        this.add(url, title);
+    }
 
-        // let domain = this.getdomain(url);
-        let found = this.find(url, 0); // usrl
+    totalize(url, title, n){
+        this.timerobj.stop();
 
-        // :after
+        let found = this.find(url, n); // usrl
+        console.log(n, found);
+        let val, index, pushobj;
         if (!found) {    // result does not exist
-            this.n++;
-            this.result.url.push({
-                "urlID": this.n,
-                "title": title,
-                "url": url,
-                "timer": 0,
-                "timerdisplay": "0:0:0:0",
-                "recent": 0,
-            });
-            let timerobj = new Timer();
-            timerobj.start();
-
-            this.latestobj = timerobj;
-            this.URLlatestid = this.n;
+            if (n == 0) { //存在しない且つurlの場合
+                val = this.result.url;
+                index = this.URLindex++;
+                pushobj = {
+                    urlID: 0,
+                    title: title,
+                    url: url,
+                    timer: 0,
+                    timerdisplay: "0:0:0:0",
+                    recent: 0,
+                }
+            } if (n == 1) { //存在しない且つdomainの場合
+                val = this.result.domain;
+                index = this.DOMAINindex++;
+                url = this.getdomain(url);  // domain
+                pushobj = {
+                    domainID: 0,
+                    domain: url,
+                    timer: 0,
+                    timerdisplay: "0:0:0:0",
+                    recent: 0,
+                }
+            }
+            val.push(pushobj);
 
         } else {        // result already exists
-            let timerobj = new Timer();
-            let current = this.result.url[found].timer;
-            timerobj.start(current);
-            this.latestobj = timerobj;
-            this.URLlatestid = found;
+            if (n == 0) { //存在する且つurlの場合
+                val = this.result.url;
+                index = found;
+            } if (n == 1) { //存在する且つdomainの場合
+                val = this.result.domain;
+                index = found;
+            }
         }
+
+        let time = this.timerobj.timer(); // addからの経過時間
+        let current = val[index].timer; // 現在のtime
+        val[index].timer += time;       // 現在のtimeに加算
+        current = val[index].timer;     // tmp
+        val[index].timerdisplay = this.timerobj.formatTime(current);   // 表示用に変換, 更新
+        val[index].recent = new Date(); // 最新の経過時間
     }
 
-    _reload() {
+    add() {
+        // :before
+        // console.log(this.result);
+        // this.latestobj.stop();
+        // let time = this.latestobj.time;                     // 前回addからの経過時間
+        // console.log(time);
+        // let URLcurrent = this.result.url[this.URLlatestIndex].timer; // 現在のtime
+        // let DOMAINcurrent = this.result.domain[this.DOMAINlatestIndex].timer; // 現在のtime
+        // this.result.url[this.URLlatestIndex].timer += time;       // 現在のtimeに加算
+        // this.result.domain[this.DOMAINlatestIndex].timer += time;    // 現在のtimeに加算
+        // URLcurrent = this.result.url[this.URLlatestIndex].timer;     // tmp
+        // DOMAINcurrent = this.result.domain[this.DOMAINlatestIndex].timer; // tmp
+        // this.result.url[this.URLlatestIndex].timerdisplay = this.latestobj.formatTime(URLcurrent);   // 表示用に変換, 更新
+        // this.result.domain[this.DOMAINlatestIndex].timerdisplay = this.latestobj.formatTime(DOMAINcurrent); // 表示用に変換, 更新
+        // this.result.url[this.URLlatestIndex].recent = new Date();       // 最新の経過時間
+        // this.result.domain[this.DOMAINlatestIndex].recent = new Date();    // 最新の経過時間
+
+        // let domain = this.getdomain(url);
+
+
+        this.timerobj = new Timer();
+        this.timerobj.start();
+    }
+
+    _init() {
         this.add("https://example.com/example", "example");
     }
 
@@ -107,6 +120,7 @@ class TabTimer {
         if (type == 0) {
             keymaps = this.urlkeymap;
         } else {
+            arg = this.getdomain(arg);
             keymaps = this.domainkeymap;
         }
 
@@ -155,22 +169,6 @@ async function getTabInfo(from) { //  awaitはpromiseのresolveを待ち、そ�
 let tabtimer = new TabTimer();
 let flg = false;
 
-// tabtimer.add("https://example.com/example100", "example"); // 3seconds
-// console.log(tabtimer);
-
-// setTimeout(() => { 
-//     tabtimer.add("https://example.com/example2", "example2"); // 4seconds
-//     console.log(tabtimer);
-//     setTimeout(() => { 
-//         tabtimer.add("https://example.com/example100", "example"); // 5seconds
-//         console.log(tabtimer);
-//         setTimeout(() => { 
-//             tabtimer.add("https://example.com/example3", "example"); // 00
-//             console.log(tabtimer);
-//         }, 5000);    
-//     }, 4000);
-// }, 3000);
-
 
 chrome.tabs.onActivated.addListener(async function (activeInfo) {
     if (flg) {
@@ -181,7 +179,7 @@ chrome.tabs.onActivated.addListener(async function (activeInfo) {
     }
     console.log("onActivated");
     let data = await getTabInfo()
-    tabtimer.add(data.forcus.url, data.forcus.title);
+    tabtimer.load(data.forcus.url, data.forcus.title);
 });
 
 chrome.windows.onFocusChanged.addListener(async function (windowId) {
@@ -194,7 +192,7 @@ chrome.windows.onFocusChanged.addListener(async function (windowId) {
     if (windowId != -1) {
         console.log("onFocusChanged");
         let data = await getTabInfo()
-        tabtimer.add(data.forcus.url, data.forcus.title);
+        tabtimer.load(data.forcus.url, data.forcus.title);
     }
 });
 
@@ -208,6 +206,6 @@ chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, tab) {
     if (changeInfo.url != undefined) {
         console.log("onUpdated");
         let data = await getTabInfo()
-        tabtimer.add(data.forcus.url, data.forcus.title);
+        tabtimer.load(data.forcus.url, data.forcus.title);
         }
 });
