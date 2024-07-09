@@ -7,12 +7,12 @@ export class Timer {
 
     start(n=0) {
         this.t0 = new Date();
-        console.log("Timer started");
+        // console.log("Timer started");
         this.interaval = setInterval(this.timer.bind(this), 1000);
     }
 
     stop() {
-        console.log("Timer stopped");
+        // console.log("Timer stopped");
         this.total += this.time;
         this.latest = new Date();
         clearInterval(this.interaval);
