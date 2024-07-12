@@ -1,11 +1,16 @@
 "use strict";
 import { Timer } from "./timer.js";
 
+let IGNORE;
+async function getIgnore() {
+    console.log(await fetch('../ignore.json')).json();
+}
+
 class TabTimer {
     constructor() {
         this.n = 0;
         this.recent;
-        this.result = {url: [], domain: []};
+        this.result = { url: [], domain: [] };
         this.urlkeymap = {};
         this.domainkeymap = {};
         this.updateKeymap();
@@ -13,7 +18,7 @@ class TabTimer {
         this._init();
         this.URLindex = 0;
         this.DOMAINindex = 0;
-        this.url = {url: "example.com/example", title: "example"};
+        this.url = { url: "example.com/example", title: "example" };
     }
 
     load(url, title) {
@@ -23,7 +28,7 @@ class TabTimer {
         this.add(url, title);
     }
 
-    totalize(url, title, n){
+    totalize(url, title, n) {
         this.timerobj.stop();
 
         let found = this.find(url, n); // usrl
@@ -81,7 +86,7 @@ class TabTimer {
     _init() {
         this.add();
     }
-                                                                                   
+
     getdomain(url) {
         let dmain = url.split("/")[2];
         return dmain;
@@ -133,11 +138,11 @@ async function getTabInfo(from) { //  awaitはpromiseのresolveを待ち、そ�
             "title": "",
         }
     };
-    
+
     let forcus = await chrome.tabs.query({ active: true, currentWindow: true });
     tabinfo.forcus.url = forcus[0].url;
     tabinfo.forcus.title = forcus[0].title;
-    
+
     try {
         let audio = await chrome.tabs.query({ audible: true });
         tabinfo.audio.url = audio[0].url;
@@ -148,10 +153,15 @@ async function getTabInfo(from) { //  awaitはpromiseのresolveを待ち、そ�
     return tabinfo;
 }
 
+async function getIgnore() {
+    let ignore = await fetch('../ignore.json');
+    return ignore.json();
+}
+
 let tabtimer = new TabTimer();
 let flg = false;
 
-async function tabsupdate(from){ // atode追記
+async function tabsupdate(from) { // atode追記
     console.log(from);
 }
 
