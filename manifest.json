@@ -7,7 +7,9 @@
         "activeTab",
         "scripting",
         "tabs",
-        "windows"
+        "windows",
+        "storage",
+        "unlimitedStorage"
     ],
     "action": {
         "default_popup": "popup.html"

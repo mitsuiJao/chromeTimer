@@ -1,11 +1,6 @@
 "use strict";
 import { Timer } from "./timer.js";
 
-let IGNORE;
-async function getIgnore() {
-    console.log(await fetch('../ignore.json')).json();
-}
-
 class TabTimer {
     constructor() {
         this.n = 0;
@@ -26,10 +21,14 @@ class TabTimer {
         this.totalize(url, title, 1);
         console.log(this.result);
         this.add(url, title);
+        write(this.result);
     }
 
     totalize(url, title, n) {
         this.timerobj.stop();
+        if (title == "新しいタブ"){
+            return;
+        }
 
         let found = this.find(url, n); // usrl
         let val, index, pushobj;
@@ -153,17 +152,8 @@ async function getTabInfo(from) { //  awaitはpromiseのresolveを待ち、そ�
     return tabinfo;
 }
 
-async function getIgnore() {
-    let ignore = await fetch('../ignore.json');
-    return ignore.json();
-}
-
 let tabtimer = new TabTimer();
 let flg = false;
-
-async function tabsupdate(from) { // atode追記
-    console.log(from);
-}
 
 chrome.tabs.onActivated.addListener(async function (activeInfo) {
     if (flg) {
@@ -173,7 +163,7 @@ chrome.tabs.onActivated.addListener(async function (activeInfo) {
         setTimeout(() => { flg = false; }, 100);
     }
     console.log("onActivated");
-    let data = await getTabInfo()
+    let data = await getTabInfo();
     tabtimer.load(data.forcus.url, data.forcus.title);
 });
 
@@ -186,7 +176,7 @@ chrome.windows.onFocusChanged.addListener(async function (windowId) {
             setTimeout(() => { flg = false; }, 100);
         }
         console.log("onFocusChanged");
-        let data = await getTabInfo()
+        let data = await getTabInfo();
         tabtimer.load(data.forcus.url, data.forcus.title);
     }
 });
@@ -200,7 +190,16 @@ chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, tab) {
             setTimeout(() => { flg = false; }, 100);
         }
         console.log("onUpdated");
-        let data = await getTabInfo()
+        let data = await getTabInfo();
         tabtimer.load(data.forcus.url, data.forcus.title);
     }
 });
+
+
+function write(obj) {
+    chrome.storage.local.set(obj);
+}
+
+function read() {
+    return JSON.parse(localStorage.getItem("tabtimer"));
+}
