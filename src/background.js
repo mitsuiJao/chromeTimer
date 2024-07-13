@@ -13,20 +13,28 @@ class TabTimer {
         this._init();
         this.URLindex = 0;
         this.DOMAINindex = 0;
-        this.url = { url: "example.com/example", title: "example" };
     }
 
-    load(url, title) {
-        this.totalize(url, title, 0);
-        this.totalize(url, title, 1);
+    load(tabinfo) {
+        let forcusurl = tabinfo.forcus.url;
+        let forcustitle = tabinfo.forcus.title;
+        let audiourl = tabinfo.audio.url;
+        let audiotitle = tabinfo.audio.title;
+
+        this.totalize(0);
+        this.totalize(1);
         console.log(this.result);
-        this.add(url, title);
+        this.add(forcusurl, forcustitle);
         write(this.result);
     }
 
-    totalize(url, title, n) {
+    totalize(n) {
         this.timerobj.stop();
-        if (title == "新しいタブ"){
+
+        let url = this.url.url;
+        let title = this.url.title;
+
+        if (title == "新しいタブ") {
             return;
         }
 
@@ -56,6 +64,7 @@ class TabTimer {
                     recent: 0,
                 }
             }
+
             val.push(pushobj);
 
 
@@ -77,18 +86,20 @@ class TabTimer {
         val[index].recent = new Date(); // 最新の経過時間
     }
 
-    add() {
+    add(url, title) {
         this.timerobj = new Timer();
         this.timerobj.start();
+        this.url = { url: url, title: title };
     }
 
     _init() {
         this.add();
+        this.url = { url: "https://example.com/example", title: "example" };
     }
 
     getdomain(url) {
-        let dmain = url.split("/")[2];
-        return dmain;
+        const domain = new URL(url).host;
+        return domain;
     }
 
     updateKeymap() {
@@ -138,7 +149,9 @@ async function getTabInfo(from) { //  awaitはpromiseのresolveを待ち、そ�
         }
     };
 
-    let forcus = await chrome.tabs.query({ active: true, currentWindow: true });
+    try {
+        let forcus = await chrome.tabs.query({ active: true, currentWindow: true });
+    } catch (err) { }
     tabinfo.forcus.url = forcus[0].url;
     tabinfo.forcus.title = forcus[0].title;
 
@@ -163,8 +176,7 @@ chrome.tabs.onActivated.addListener(async function (activeInfo) {
         setTimeout(() => { flg = false; }, 100);
     }
     console.log("onActivated");
-    let data = await getTabInfo();
-    tabtimer.load(data.forcus.url, data.forcus.title);
+    tabtimer.load(await getTabInfo());
 });
 
 chrome.windows.onFocusChanged.addListener(async function (windowId) {
@@ -176,8 +188,7 @@ chrome.windows.onFocusChanged.addListener(async function (windowId) {
             setTimeout(() => { flg = false; }, 100);
         }
         console.log("onFocusChanged");
-        let data = await getTabInfo();
-        tabtimer.load(data.forcus.url, data.forcus.title);
+        tabtimer.load(await getTabInfo());
     }
 });
 
@@ -190,8 +201,7 @@ chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, tab) {
             setTimeout(() => { flg = false; }, 100);
         }
         console.log("onUpdated");
-        let data = await getTabInfo();
-        tabtimer.load(data.forcus.url, data.forcus.title);
+        tabtimer.load(await getTabInfo());
     }
 });
 
