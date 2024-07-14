@@ -7,8 +7,8 @@ if (query == "") {
 
 function createKeymap(obj) {
     let result = {
-        url: [],
-        domain: []
+        url: {},
+        domain: {}
     };
 
     obj.url.forEach((value, index) => {
@@ -22,6 +22,17 @@ function createKeymap(obj) {
     return result;
 }
 
+function urlFromDomain (data, domain) {
+    let result = []
+    let keymap = createKeymap(data);
+    let tmp = keymap.domain[domain];
+    let urlset = data.domain[tmp].urlset;
+    urlset.forEach((val) => {
+        result.push(data.domain[val]);
+    });
+    return result;
+}
+
 function buileHTML(data, query){
     let domain = data.domain; //arr
     let url = data.url;
@@ -29,7 +40,7 @@ function buileHTML(data, query){
     if (query == "domain") {
         add = domain;
     } else {
-        
+
     }
 
     let html = "";
@@ -44,7 +55,7 @@ function buileHTML(data, query){
     html +=     '</tr>'
     html += '</thead>'
 
-    .forEach((element, index) => {
+    aaaaaaa.forEach((element, index) => {
         html += '<tr>'
         html +=     `<td>${index}</td>`
         html +=     `<td>${element[query]}</td>`
@@ -58,6 +69,6 @@ function buileHTML(data, query){
 
 chrome.storage.local.get(null, function (data) {
     console.log(data);
-    let keymap = createKeymap(data);
+    console.log(urlFromDomain(data, "www.youtube.com"));
     // buileHTML(data, query);
 });
