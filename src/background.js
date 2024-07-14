@@ -158,7 +158,6 @@ async function getTabInfo(from) { //  awaitはpromiseのresolveを待ち、そ�
 
     try {
         let forcus = await chrome.tabs.query({ active: true, currentWindow: true });
-        console.log(forcus)
         tabinfo.forcus.url = forcus[0].url;
         tabinfo.forcus.title = forcus[0].title;
         tabinfo.forcus.icon = forcus[0].favIconUrl;
@@ -221,8 +220,4 @@ chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, tab) {
 
 function write(obj) {
     chrome.storage.local.set(obj);
-}
-
-function read() {
-    return JSON.parse(localStorage.getItem("tabtimer"));
 }
