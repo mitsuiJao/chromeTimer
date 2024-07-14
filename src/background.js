@@ -23,8 +23,11 @@ class TabTimer {
         let audiotitle = tabinfo.audio.title;
         let audioicon = tabinfo.audio.icon;
         
-        this.totalize(0);
-        this.totalize(1);
+        this.totalize(1); // domain
+        this.totalize(0); // url
+
+        // attention!!!!! Above processing depends on the order!!!!
+
         console.log(this.result);
         this.add(forcusurl, forcustitle, forcusicon);
         write(this.result);
@@ -47,6 +50,7 @@ class TabTimer {
             if (n == 0) { //存在しない且つurlの場合
                 val = this.result.url;
                 index = this.URLindex++;
+                this.result.domain[this.find(url, 1)].urlset.push(index);
                 pushobj = {
                     urlID: index,
                     title: title,
@@ -66,7 +70,8 @@ class TabTimer {
                     timer: 0,
                     timerdisplay: "0:0:0:0",
                     recent: 0,
-                    icon: icon
+                    icon: icon,
+                    urlset: [] // id
                 }
             }
 
