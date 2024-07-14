@@ -18,21 +18,24 @@ class TabTimer {
     load(tabinfo) {
         let forcusurl = tabinfo.forcus.url;
         let forcustitle = tabinfo.forcus.title;
+        let forcusicon = tabinfo.forcus.icon;
         let audiourl = tabinfo.audio.url;
         let audiotitle = tabinfo.audio.title;
-
+        let audioicon = tabinfo.audio.icon;
+        
         this.totalize(0);
         this.totalize(1);
         console.log(this.result);
-        this.add(forcusurl, forcustitle);
+        this.add(forcusurl, forcustitle, forcusicon);
         write(this.result);
     }
 
     totalize(n) {
         this.timerobj.stop();
 
-        let url = this.url.url;
-        let title = this.url.title;
+        let url = this.forcusURL.url;
+        let title = this.forcusURL.title;
+        let icon = this.forcusURL.icon;
 
         if (title == "新しいタブ") {
             return;
@@ -52,6 +55,7 @@ class TabTimer {
                     timerdisplay: "0:0:0:0",
                     recent: 0,
                 }
+
             } if (n == 1) { //存在しない且つdomainの場合
                 val = this.result.domain;
                 index = this.DOMAINindex++;
@@ -62,6 +66,7 @@ class TabTimer {
                     timer: 0,
                     timerdisplay: "0:0:0:0",
                     recent: 0,
+                    icon: icon
                 }
             }
 
@@ -86,15 +91,15 @@ class TabTimer {
         val[index].recent = new Date(); // 最新の経過時間
     }
 
-    add(url, title) {
+    add(url, title, icon) {
         this.timerobj = new Timer();
         this.timerobj.start();
-        this.url = { url: url, title: title };
+        this.forcusURL = { url: url, title: title, icon: icon};
     }
 
     _init() {
         this.add();
-        this.url = { url: "https://example.com/example", title: "example" };
+        this.forcusURL = { url: "https://example.com/example", title: "example", icon: "https://example.com/favicon.ico"};
     }
 
     getdomain(url) {
@@ -139,26 +144,34 @@ class TabTimer {
 async function getTabInfo(from) { //  awaitはpromiseのresolveを待ち、その値を返す、rejectされた場合はエラーを投げる
     // console.log(from);
     let tabinfo = {
-        "forcus": {
-            "url": "",
-            "title": ""
+        forcus: {
+            url: "",
+            title: "",
+            icon: ""
         },
-        "audio": {
-            "url": "",
-            "title": "",
+        audio: {
+            url: "",
+            title: "",
+            icon: ""
         }
     };
 
     try {
         let forcus = await chrome.tabs.query({ active: true, currentWindow: true });
-    } catch (err) { }
-    tabinfo.forcus.url = forcus[0].url;
-    tabinfo.forcus.title = forcus[0].title;
+        console.log(forcus)
+        tabinfo.forcus.url = forcus[0].url;
+        tabinfo.forcus.title = forcus[0].title;
+        tabinfo.forcus.icon = forcus[0].favIconUrl;
+
+    } catch (err) { 
+        // console.log("active: None");
+    }
 
     try {
         let audio = await chrome.tabs.query({ audible: true });
         tabinfo.audio.url = audio[0].url;
         tabinfo.audio.title = audio[0].title;
+        tabinfo.audio.icon = audio[0].favIconUrl;
     } catch (error) {
         // console.log("audible: None");
     }
