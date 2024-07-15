@@ -18,7 +18,6 @@ function createKeymap(obj) {
         result.domain[value.domain] = index;
     });
 
-    console.log(result);
     return result;
 }
 
@@ -28,7 +27,7 @@ function urlFromDomain (data, domain) {
     let tmp = keymap.domain[domain];
     let urlset = data.domain[tmp].urlset;
     urlset.forEach((val) => {
-        result.push(data.domain[val]);
+        result.push(data.url[val]);
     });
     return result;
 }
