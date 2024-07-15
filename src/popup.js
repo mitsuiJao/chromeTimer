@@ -54,7 +54,7 @@ function getAgo(time) {
     return ago;
 }
 
-function buileHTML(data, dom) {
+function HTMLbuilder(data, dom) {
     let add, flg;
     if (dom == undefined) {
         add = data.domain;
@@ -135,5 +135,5 @@ function getProtocol(fqdn) {
 
 chrome.storage.local.get(null, function (data) {
     console.log(data);
-    buileHTML(data, "www.youtube.com");
+    HTMLbuilder(data, "www.youtube.com");
 });
