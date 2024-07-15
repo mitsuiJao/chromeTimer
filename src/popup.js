@@ -1,6 +1,6 @@
-const querystr = window.location.search;
-const params = new URLSearchParams(querystr);
-const query = params.get('query');
+const urlobj = window.location;
+const params = new URLSearchParams(urlobj.search);
+const query = params.get('query'); // クエリはqueryキーにしないと
 
 function createKeymap(obj) {
     let result = {
@@ -30,7 +30,7 @@ function urlFromDomain(data, domain) {
 }
 
 function getAgo(time) {
-    let posted = time;
+    let posted = new Date(time);
 
     let diff = new Date().getTime() - posted.getTime();
 
@@ -54,19 +54,20 @@ function getAgo(time) {
     return ago;
 }
 
-function buileHTML(data, query) {
+function buileHTML(data, dom) {
     let add, flg;
-    if (query == undefined) {
+    if (dom == undefined) {
         add = data.domain;
         flg = "domain";
     } else {
-        add = urlFromDomain(data, query);
+        add = urlFromDomain(data, dom);
         flg = "url";
     }
 
-    console.log(add);
-
     let html = "";
+    if (flg == "url") {
+        html += `<h2>${dom}</h2>`
+    }
     html += '<table id="mytable">'
     html += '<thead>'
     html += '<tr>'
@@ -76,20 +77,32 @@ function buileHTML(data, query) {
     html += '<th>Recent</th>'
     html += '</tr>'
     html += '</thead>'
+    html += '<tbody>'
 
     add.forEach((element, index) => {
-        if (flg == "url") {
-            flg = element.url;
-        } else {
-            flg = element.domain;
-        }
-        
         console.log(element);
+        let val;
+        if (flg == "url") {
+            val = element.url;
+            let protocol = getProtocol(val);
+            val = nonMatchingPart(val, protocol);
+            val = nonMatchingPart(val, dom);
+            if (val != "/"){
+                if (val.length > 20) {
+                    val = val.slice(0, 20);
+                    val += "...";
+                }
+            }
 
-        html += '<tbody>'
+        } else {
+            val = element.domain;
+        }
+        console.log(flg);
+        let recent = getAgo(element.recent);
+
         html += '<tr>'
         html += `<td>${index}</td>`
-        html += `<td>${flg}</td>`
+        html += `<td>${val}</td>`
         html += `<td>${element.timerdisplay}</td>`
         html += `<td>${recent}</td>`
         html += '</tr>'
@@ -101,9 +114,26 @@ function buileHTML(data, query) {
     main_element.insertAdjacentHTML("beforeend", html);
 }
 
+function nonMatchingPart(longStr, shortStr) {
+    let mismatchIndex = shortStr.length;
+    for (let i = 0; i < shortStr.length; i++) {
+        if (longStr[i] !== shortStr[i]) {
+            mismatchIndex = i;
+            break;
+        }
+    }
+    return longStr.substring(mismatchIndex);
+}
+
+function getProtocol(fqdn) {
+    const r = /^(.*?):\/\//;
+    return fqdn.match(r)[0];
+}
+
+
 
 
 chrome.storage.local.get(null, function (data) {
     console.log(data);
-    buileHTML(data);
+    buileHTML(data, "www.youtube.com");
 });
