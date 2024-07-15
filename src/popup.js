@@ -1,9 +1,6 @@
 const querystr = window.location.search;
 const params = new URLSearchParams(querystr);
 const query = params.get('query');
-if (query == "") {
-    query  = "domain";
-}
 
 function createKeymap(obj) {
     let result = {
@@ -21,7 +18,7 @@ function createKeymap(obj) {
     return result;
 }
 
-function urlFromDomain (data, domain) {
+function urlFromDomain(data, domain) {
     let result = []
     let keymap = createKeymap(data);
     let tmp = keymap.domain[domain];
@@ -32,42 +29,80 @@ function urlFromDomain (data, domain) {
     return result;
 }
 
-function buileHTML(data, query){
-    let domain = data.domain; //arr
-    let url = data.url;
-    let add;
-    if (query == "domain") {
-        add = domain;
-    } else {
+function getAgo(time) {
+    let posted = time;
 
+    let diff = new Date().getTime() - posted.getTime();
+
+    let progress = new Date(diff);
+
+    let ago;
+
+    if (progress.getUTCFullYear() - 1970) {
+        ago = progress.getUTCFullYear() - 1970 + '年前';
+    } else if (progress.getUTCMonth()) {
+        ago = progress.getUTCMonth() + 'ヶ月前';
+    } else if (progress.getUTCDate() - 1) {
+        ago = progress.getUTCDate() - 1 + '日前';
+    } else if (progress.getUTCHours()) {
+        ago = progress.getUTCHours() + '時間前';
+    } else if (progress.getUTCMinutes()) {
+        ago = progress.getUTCMinutes() + '分前';
+    } else {
+        ago = 'たった今';
+    }
+    return ago;
+}
+
+function buileHTML(data, query) {
+    let add, flg;
+    if (query == undefined) {
+        add = data.domain;
+        flg = "domain";
+    } else {
+        add = urlFromDomain(data, query);
+        flg = "url";
     }
 
+    console.log(add);
+
     let html = "";
-    html += '<div id="table">'
     html += '<table id="mytable">'
     html += '<thead>'
-    html +=     '<tr>'
-    html +=         '<th>#</th>'
-    html +=         `<th>${query}</th>`
-    html +=         '<th>Time</th>'
-    html +=         '<th>Recent</th>'
-    html +=     '</tr>'
+    html += '<tr>'
+    html += '<th>#</th>'
+    html += `<th>${flg}</th>`
+    html += '<th>Time</th>'
+    html += '<th>Recent</th>'
+    html += '</tr>'
     html += '</thead>'
 
-    aaaaaaa.forEach((element, index) => {
+    add.forEach((element, index) => {
+        if (flg == "url") {
+            flg = element.url;
+        } else {
+            flg = element.domain;
+        }
+        let recent = getAgo(new Date(element.recent));
+        
+        html += '<tbody>'
         html += '<tr>'
-        html +=     `<td>${index}</td>`
-        html +=     `<td>${element[query]}</td>`
-        html +=     `<td>${element.time}</td>`
-        html +=     `<td>${element.recent}</td>`
+        html += `<td>${index}</td>`
+        html += `<td>${flg}</td>`
+        html += `<td>${element.timerdisplay}</td>`
+        html += `<td>${recent}</td>`
         html += '</tr>'
     });
+    html += '</tbody>'
+    html += '</table>'
+
+    let main_element = document.getElementById("main");
+    main_element.insertAdjacentHTML("beforeend", html);
 }
 
 
 
 chrome.storage.local.get(null, function (data) {
     console.log(data);
-    console.log(urlFromDomain(data, "www.youtube.com"));
-    // buileHTML(data, query);
+    buileHTML(data);
 });
