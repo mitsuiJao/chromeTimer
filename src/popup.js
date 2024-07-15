@@ -83,8 +83,9 @@ function buileHTML(data, query) {
         } else {
             flg = element.domain;
         }
-        let recent = getAgo(new Date(element.recent));
         
+        console.log(element);
+
         html += '<tbody>'
         html += '<tr>'
         html += `<td>${index}</td>`

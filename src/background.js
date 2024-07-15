@@ -93,7 +93,7 @@ class TabTimer {
         val[index].timer += time;       // 現在のtimeに加算
         current = val[index].timer;     // tmp
         val[index].timerdisplay = this.timerobj.formatTime(current);   // 表示用に変換, 更新
-        val[index].recent = new Date(); // 最新の経過時間
+        val[index].recent = getFormatDate(); // 最新の経過時間
     }
 
     add(url, title, icon) {
@@ -144,7 +144,18 @@ class TabTimer {
     }
 }
 
-
+function getFormatDate(){
+    const now = new Date();
+    let formated;
+    let yyyy = now.getFullYear();
+    let mm = now.getMonth() + 1;
+    let dd = now.getDate();
+    let hh = now.getHours();
+    let mi = now.getMinutes();
+    let ss = now.getSeconds();
+    formated = `${yyyy}/${mm}/${dd} ${hh}:${mi}:${ss}`;
+    return formated;
+}
 
 async function getTabInfo(from) { //  awaitはpromiseのresolveを待ち、その値を返す、rejectされた場合はエラーを投げる
     // console.log(from);
