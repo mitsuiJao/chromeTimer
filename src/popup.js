@@ -19,9 +19,11 @@ function createKeymap(obj) {
 }
 
 function urlFromDomain(data, domain) {
-    let result = []
+    console.log(data);
+    let result = [];
     let keymap = createKeymap(data);
     let tmp = keymap.domain[domain];
+    console.log(tmp);
     let urlset = data.domain[tmp].urlset;
     urlset.forEach((val) => {
         result.push(data.url[val]);
@@ -67,6 +69,7 @@ function HTMLbuilder(data, dom) {
     let html = "";
     if (flg == "url") {
         html += `<h2>${dom}</h2>`
+        html += `<a href="popup.html">back</a>`
     }
     html += '<table id="mytable">'
     html += '<thead>'
@@ -87,7 +90,7 @@ function HTMLbuilder(data, dom) {
             let protocol = getProtocol(val);
             val = nonMatchingPart(val, protocol);
             val = nonMatchingPart(val, dom);
-            if (val != "/"){
+            if (val != "/") {
                 if (val.length > 20) {
                     val = val.slice(0, 20);
                     val += "...";
@@ -97,14 +100,14 @@ function HTMLbuilder(data, dom) {
         } else {
             val = element.domain;
         }
-        console.log(flg);
+
         let recent = getAgo(element.recent);
 
-        html += '<tr>'
-        html += `<td>${index}</td>`
-        html += `<td>${val}</td>`
-        html += `<td>${element.timerdisplay}</td>`
-        html += `<td>${recent}</td>`
+        html += '<tr class="row">'
+        html += `<td class="index">${index}</td>`
+        html += `<td class="value">${val}</td>`
+        html += `<td class="time">${element.timerdisplay}</td>`
+        html += `<td class="ago">${recent}</td>`
         html += '</tr>'
     });
     html += '</tbody>'
@@ -128,9 +131,7 @@ function nonMatchingPart(longStr, shortStr) {
 function getProtocol(fqdn) {
     const r = /^(.*?):\/\//;
     return fqdn.match(r)[0];
-}
-
-
+}    
 
 
 chrome.storage.local.get(null, function (data) {

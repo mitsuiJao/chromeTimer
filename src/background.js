@@ -108,7 +108,7 @@ class TabTimer {
     }
 
     getdomain(url) {
-        const domain = new URL(url).hostname;
+        let domain = new URL(url).hostname;
         return domain;
     }
 
