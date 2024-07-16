@@ -110,6 +110,9 @@ class TabTimer {
 
     getdomain(url) {
         let domain = new URL(url).hostname;
+        if (domain.startsWith("www.")) {
+            domain = domain.slice(4);
+        }
         return domain;
     }
 

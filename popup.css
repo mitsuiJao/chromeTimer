@@ -3,10 +3,18 @@ body {
     height: 500px;
 }
 
+#mytable {
+    width: 100%;
+}
 .value {
     cursor: pointer;
+    width: 152.766px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 #back {
     cursor: pointer;
+    color: #0000EE;
 }

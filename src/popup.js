@@ -29,6 +29,7 @@ function urlFromDomain(data, domain) {
     urlset.forEach((val) => {
         result.push(data.url[val]);
     });
+    console.log(result);
     return result;
 }
 
@@ -57,8 +58,9 @@ function getAgo(time) {
     return ago;
 }
 
-function HTMLbuilder(data, dom) {
+function HTMLbuilder(data, dom) { // dom = domain
     let add, flg;
+    console.log(dom);
     if (dom == undefined) {
         add = data.domain;
         flg = "domain";
@@ -70,7 +72,7 @@ function HTMLbuilder(data, dom) {
     let html = "";
     if (flg == "url") {
         html += `<p id="back">back</p>`
-        html += `<h2>${dom}</h2>`
+        html += `<h2 id="domain">${dom}</h2>`
     }
     html += '<table id="mytable">'
     html += '<thead>'
@@ -89,13 +91,16 @@ function HTMLbuilder(data, dom) {
             val = element.url;
             let protocol = getProtocol(val);
             val = nonMatchingPart(val, protocol);
-            val = nonMatchingPart(val, dom);
-            if (val != "/") {
-                if (val.length > 20) {
-                    val = val.slice(0, 20);
-                    val += "...";
-                }
+            if (val.startsWith("www.")) {
+                val = val.slice(4);
             }
+            val = nonMatchingPart(val, dom);
+            // if (val != "/") {
+            //     if (val.length > 20) {
+            //         val = val.slice(0, 20);
+            //         val += "...";
+            //     }
+            // }
 
         } else {
             val = element.domain;
@@ -134,32 +139,46 @@ function getProtocol(fqdn) {
 }
 
 
-function clicked(){
+function domainclicked(){
     console.log(this.innerText);
     let redirect = here + "?query=" + this.innerText;
     window.location.href = redirect;
 }
 
+function urlclicked(e){
+    console.log(e);
+    let redirect = "http://" + this.domain + e.currentTarget.innerText;
+    console.log(redirect);
+    open(redirect);
+}
+
 
 // main
-if (query == null){
+if (query == null){ // domain
     chrome.storage.local.get(null, function (data) {
         HTMLbuilder(data);
         let tblElem = document.getElementById("mytable");
         for (let i=0; i<tblElem.rows.length; i++) {
-            for (let j=0; j<tblElem.rows[i].cells.length; j++) {
-                tblElem.rows[i].cells[j].addEventListener("click", clicked);
-            }
+            tblElem.rows[i].cells[1].addEventListener("click", domainclicked);
         }
     });
-} else {
+} else { // url from query
     chrome.storage.local.get(null, function (data) {
         HTMLbuilder(data, query);
+        let url = urlFromDomain(data, query);
+
         let back = document.getElementById("back");
         back.addEventListener("click", () => {
             let redirect = here;
             window.location.href = redirect;
         });
+
+        let tblElem = document.getElementById("mytable");
+        let domain = document.getElementById("domain").innerText;
+        console.log(domain);
+        for (let i=0; i<tblElem.rows.length; i++) {
+            tblElem.rows[i].cells[1].addEventListener("click", {domain: domain, handleEvent: urlclicked});
+        }
     });
 }
 
