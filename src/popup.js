@@ -140,6 +140,7 @@ function clicked(){
     window.location.href = redirect;
 }
 
+
 // main
 if (query == null){
     chrome.storage.local.get(null, function (data) {
