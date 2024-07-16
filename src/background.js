@@ -16,6 +16,7 @@ class TabTimer {
     }
 
     load(tabinfo) {
+        console.log(tabinfo);
         let forcusurl = tabinfo.forcus.url;
         let forcustitle = tabinfo.forcus.title;
         let forcusicon = tabinfo.forcus.icon;
@@ -174,6 +175,7 @@ async function getTabInfo(from) { //  awaitはpromiseのresolveを待ち、そ�
 
     try {
         let forcus = await chrome.tabs.query({ active: true, currentWindow: true });
+        console.log(forcus);
         tabinfo.forcus.url = forcus[0].url;
         tabinfo.forcus.title = forcus[0].title;
         tabinfo.forcus.icon = forcus[0].favIconUrl;

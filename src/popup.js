@@ -1,6 +1,8 @@
 const urlobj = window.location;
 const params = new URLSearchParams(urlobj.search);
 const query = params.get('query'); // クエリはqueryキーにしないと
+const here = "chrome-extension://haedipgcgmnfablkhjgdfekllaoefhia/popup.html";
+
 
 function createKeymap(obj) {
     let result = {
@@ -23,7 +25,6 @@ function urlFromDomain(data, domain) {
     let result = [];
     let keymap = createKeymap(data);
     let tmp = keymap.domain[domain];
-    console.log(tmp);
     let urlset = data.domain[tmp].urlset;
     urlset.forEach((val) => {
         result.push(data.url[val]);
@@ -68,8 +69,8 @@ function HTMLbuilder(data, dom) {
 
     let html = "";
     if (flg == "url") {
+        html += `<p id="back">back</p>`
         html += `<h2>${dom}</h2>`
-        html += `<a href="popup.html">back</a>`
     }
     html += '<table id="mytable">'
     html += '<thead>'
@@ -83,7 +84,6 @@ function HTMLbuilder(data, dom) {
     html += '<tbody>'
 
     add.forEach((element, index) => {
-        console.log(element);
         let val;
         if (flg == "url") {
             val = element.url;
@@ -105,7 +105,7 @@ function HTMLbuilder(data, dom) {
 
         html += '<tr class="row">'
         html += `<td class="index">${index}</td>`
-        html += `<td class="value">${val}</td>`
+        html += `<td><div class="value">${val}</div></td>`
         html += `<td class="time">${element.timerdisplay}</td>`
         html += `<td class="ago">${recent}</td>`
         html += '</tr>'
@@ -131,10 +131,34 @@ function nonMatchingPart(longStr, shortStr) {
 function getProtocol(fqdn) {
     const r = /^(.*?):\/\//;
     return fqdn.match(r)[0];
-}    
+}
 
 
-chrome.storage.local.get(null, function (data) {
-    console.log(data);
-    HTMLbuilder(data, "www.youtube.com");
-});
+function clicked(){
+    console.log(this.innerText);
+    let redirect = here + "?query=" + this.innerText;
+    window.location.href = redirect;
+}
+
+// main
+if (query == null){
+    chrome.storage.local.get(null, function (data) {
+        HTMLbuilder(data);
+        let tblElem = document.getElementById("mytable");
+        for (let i=0; i<tblElem.rows.length; i++) {
+            for (let j=0; j<tblElem.rows[i].cells.length; j++) {
+                tblElem.rows[i].cells[j].addEventListener("click", clicked);
+            }
+        }
+    });
+} else {
+    chrome.storage.local.get(null, function (data) {
+        HTMLbuilder(data, query);
+        let back = document.getElementById("back");
+        back.addEventListener("click", () => {
+            let redirect = here;
+            window.location.href = redirect;
+        });
+    });
+}
+

@@ -2,3 +2,11 @@ body {
     width: 300px;
     height: 500px;
 }
+
+.value {
+    cursor: pointer;
+}
+
+#back {
+    cursor: pointer;
+}
