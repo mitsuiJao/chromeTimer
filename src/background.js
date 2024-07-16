@@ -16,7 +16,7 @@ class TabTimer {
     }
 
     load(tabinfo) {
-        console.log(tabinfo);
+        console.log("debug: ", tabinfo);
         let forcusurl = tabinfo.forcus.url;
         let forcustitle = tabinfo.forcus.title;
         let forcusicon = tabinfo.forcus.icon;
@@ -45,6 +45,7 @@ class TabTimer {
             return;
         }
 
+        console.log("debug: ", url, n);
         let found = this.find(url, n); // usrl
         let val, index, pushobj;
         if (found === false) {    // result does not exist
@@ -109,6 +110,7 @@ class TabTimer {
     }
 
     getdomain(url) {
+        console.log("debug: ", url);
         let domain = new URL(url).hostname;
         if (domain.startsWith("www.")) {
             domain = domain.slice(4);
@@ -131,6 +133,7 @@ class TabTimer {
         if (type == 0) {
             keymaps = this.urlkeymap;
         } else {
+            console.log("debug: ", arg);
             arg = this.getdomain(arg);
             keymaps = this.domainkeymap;
         }
@@ -234,6 +237,7 @@ chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, tab) {
             setTimeout(() => { flg = false; }, 100);
         }
         console.log("onUpdated");
+        console.log("debug: ", tab, changeInfo);
         tabtimer.load(await getTabInfo());
     }
 });
