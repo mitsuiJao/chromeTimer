@@ -61,6 +61,7 @@ function getAgo(time) {
 }
 
 function HTMLbuilder(data, dom) { // dom = domain
+
     let add, flg;
     console.log(dom);
     if (dom == undefined) {
@@ -79,13 +80,13 @@ function HTMLbuilder(data, dom) { // dom = domain
     html += '<table id="mytable">'
     html += '<thead>'
     html += '<tr>'
-    html += '<th>#</th>'
-    html += `<th>${flg}</th>`
+    html += '<th class="index">#</th>'
+    html += `<th class="value">${flg}</th>`
     if (flg == "url") {
-        html += `<th>title</th>`
+        html += `<th class="title">title</th>`
     }
-    html += '<th>Time</th>'
-    html += '<th>Recent</th>'
+    html += '<th class="time">Time</th>'
+    html += '<th class="ago">Recent</th>'
     html += '</tr>'
     html += '</thead>'
     html += '<tbody>'
@@ -115,7 +116,7 @@ function HTMLbuilder(data, dom) { // dom = domain
 
         html += '<tr class="row">'
         html += `<td class="index">${index}</td>`
-        html += `<td><div class="value">${val}</div></td>`
+        html += `<td class="value">${val}</td>`
         if (flg == "url") {
             html += `<td class="title">${element.title}</td>`
         }
@@ -184,7 +185,7 @@ if (query == null){ // domain
         let tblElem = document.getElementById("mytable");
         let domain = document.getElementById("domain").innerText;
         console.log(domain);
-        for (let i=0; i<tblElem.rows.length; i++) {
+        for (let i=1; i<tblElem.rows.length; i++) {
             tblElem.rows[i].cells[1].addEventListener("click", {domain: domain, handleEvent: urlclicked});
         }
     });

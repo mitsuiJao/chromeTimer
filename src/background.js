@@ -16,7 +16,6 @@ class TabTimer {
     }
 
     load(tabinfo) {
-        console.log("debug: ", tabinfo);
         let forcusurl = tabinfo.forcus.url;
         let forcustitle = tabinfo.forcus.title;
         let forcusicon = tabinfo.forcus.icon;
@@ -26,7 +25,6 @@ class TabTimer {
         
         try {
             new URL(forcusurl);
-            new URL(audiourl);
         } catch (error) {
             return;
         }
@@ -38,6 +36,7 @@ class TabTimer {
 
         console.log(this.result);
         this.add(forcusurl, forcustitle, forcusicon);
+        console.log(this.result);
         write(this.result);
     }
 

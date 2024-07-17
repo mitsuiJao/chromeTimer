@@ -2,19 +2,38 @@ body {
     width: 500px;
     height: 500px;
 }
-
+#back {
+    cursor: pointer;
+    color: #0000EE;
+}
 #mytable {
     width: 100%;
+    table-layout: fixed;
 }
+
+.index {
+    width: 5%;
+}
+
 .value {
     cursor: pointer;
-    width: 152.766px;
+    width: 50%;
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
 }
 
-#back {
-    cursor: pointer;
-    color: #0000EE;
+.title {
+    width: 30%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.time {
+    width: 10%;
+}
+
+.ago {
+    width: 10%;
 }
