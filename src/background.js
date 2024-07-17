@@ -24,6 +24,13 @@ class TabTimer {
         let audiotitle = tabinfo.audio.title;
         let audioicon = tabinfo.audio.icon;
         
+        try {
+            new URL(forcusurl);
+            new URL(audiourl);
+        } catch (error) {
+            return;
+        }
+
         this.totalize(1); // domain
         this.totalize(0); // url
 
@@ -42,6 +49,12 @@ class TabTimer {
         let icon = this.forcusURL.icon;
 
         if (title == "新しいタブ") {
+            return;
+        } 
+        if (url.startsWith("file://")) {
+            return;
+        }
+        if (url.startsWith("chrome://")) {
             return;
         }
 
@@ -164,6 +177,10 @@ function getFormatDate(){
     return formated;
 }
 
+function write(obj) {
+    chrome.storage.local.set(obj);
+}
+
 async function getTabInfo(from) { //  awaitはpromiseのresolveを待ち、その値を返す、rejectされた場合はエラーを投げる
     // console.log(from);
     let tabinfo = {
@@ -242,7 +259,3 @@ chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, tab) {
     }
 });
 
-
-function write(obj) {
-    chrome.storage.local.set(obj);
-}

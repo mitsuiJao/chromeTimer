@@ -81,6 +81,9 @@ function HTMLbuilder(data, dom) { // dom = domain
     html += '<tr>'
     html += '<th>#</th>'
     html += `<th>${flg}</th>`
+    if (flg == "url") {
+        html += `<th>title</th>`
+    }
     html += '<th>Time</th>'
     html += '<th>Recent</th>'
     html += '</tr>'
@@ -113,6 +116,9 @@ function HTMLbuilder(data, dom) { // dom = domain
         html += '<tr class="row">'
         html += `<td class="index">${index}</td>`
         html += `<td><div class="value">${val}</div></td>`
+        if (flg == "url") {
+            html += `<td class="title">${element.title}</td>`
+        }
         html += `<td class="time">${element.timerdisplay}</td>`
         html += `<td class="ago">${recent}</td>`
         html += '</tr>'
@@ -168,7 +174,7 @@ if (query == null){ // domain
     chrome.storage.local.get(null, function (data) {
         HTMLbuilder(data, query);
         let url = urlFromDomain(data, query);
-
+        
         let back = document.getElementById("back");
         back.addEventListener("click", () => {
             let redirect = loot;
