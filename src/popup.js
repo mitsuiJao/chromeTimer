@@ -1,7 +1,9 @@
 const urlobj = window.location;
+const tmp = urlobj.search
 const params = new URLSearchParams(urlobj.search);
 const query = params.get('query'); // クエリはqueryキーにしないと
-const here = "chrome-extension://haedipgcgmnfablkhjgdfekllaoefhia/popup.html";
+const here = urlobj.href;
+const loot = urlobj.origin + urlobj.pathname;
 
 
 function createKeymap(obj) {
@@ -169,7 +171,7 @@ if (query == null){ // domain
 
         let back = document.getElementById("back");
         back.addEventListener("click", () => {
-            let redirect = here;
+            let redirect = loot;
             window.location.href = redirect;
         });
 
