@@ -12,19 +12,19 @@ body {
 }
 
 .index {
-    width: 5%;
+    width: 4%;
 }
 
 .value {
     cursor: pointer;
-    width: 50%;
+    width: 40%;
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
 }
 
 .title {
-    width: 30%;
+    width: 40%;
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
@@ -35,5 +35,5 @@ body {
 }
 
 .ago {
-    width: 10%;
+    width: 12%;
 }

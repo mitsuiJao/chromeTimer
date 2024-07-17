@@ -61,7 +61,6 @@ function getAgo(time) {
 }
 
 function HTMLbuilder(data, dom) { // dom = domain
-
     let add, flg;
     console.log(dom);
     if (dom == undefined) {
@@ -92,6 +91,7 @@ function HTMLbuilder(data, dom) { // dom = domain
     html += '<tbody>'
 
     add.forEach((element, index) => {
+        console.log(element);
         let val;
         if (flg == "url") {
             val = element.url;
